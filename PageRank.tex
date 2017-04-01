@@ -164,12 +164,12 @@ In the first chapter of this report, we will explore mathematical representation
 
 
 %--------------------Matrix Representation 
-\chapter{Mathematical Representation}
+\chapter{Mathematical Representation} \label{ch:Math}
 In this chapter we aim to represent the PageRank equation mathematically, in section 2.1, we use summation formulas to represent the algorithm, and introduce the idea of an iterative process to compute the PageRank vector. In section 2.2 we represent the PageRank equation using matrices, and discuss the two adjustments required in order to use Markov theory to solve the PageRank equation leading to the formation of a dense Google Matrix. We will discuss the use of the power method to solve the PageRank equation in section 2.3.
 
 The references Austin \cite{austin}, Bonato \cite{bonato} and Langville \cite{langville} were consulted during the writing of this chapter, and the material has been collated below.  
 
-\section{Summation Formula of PageRank}
+\section{Summation Formula of PageRank} \label{sec:summ}
 In order to mathematically represent the PageRank algorithm, Brin and Page first assigned each page, $P_i$, a rank
 \begin{equation}
 r(P_i) = \displaystyle \sum_{P_j\in B_{P_i }} \frac{r(P_j)}{|P_j|}
@@ -190,7 +190,7 @@ r_{(k+1)}P_i = \displaystyle \sum_{P_j\in B_{P_i }}\frac{r_k(P_j)}{|P_j|}
  $r_0(P_6)=\frac{1}{8}$ & $r_1(P_6)=\frac{1}{24}$ & $r_2(P_6)=0$ & $6$ \\ 
  $r_0(P_7)=\frac{1}{8}$ & $r_1(P_7)=\frac{3}{16}$ & $r_2(P_7)=\frac{1}{6}$ & $3$ \\ 
  $r_0(P_8)=\frac{1}{8}$ & $r_1(P_8)=\frac{3}{16}$ & $r_2(P_8)=\frac{1}{3}$ & $1$ \\ \end{tabular}
-\label{table1}
+\label{Table:Summ}
 \end{table}
 
 \section{Matrix Representation} \label{sec:matrix}
@@ -306,7 +306,7 @@ In order to solve the PageRank equation we either need to solve the eigenvector 
 
 \cite{ipsen2005analysis}, \cite{page1999pagerank}
 \subsection{Power Method}
-
+PERRON-FROBENIUS \cite{meyer2000matrix}
 \textcolor{red}{\textbf{EXPLAIN MATHS MORE HERE}}
 
 Using matlab code as given in Appendix \ref{app:code}, 
@@ -323,6 +323,23 @@ Using matlab code as given in Appendix \ref{app:code},
 0.274
 \end{array}
 \right)\]
+
+\begin{table}[H] \caption{Ranking of web pages after two iterations and after the power method}
+ \centering
+ \begin{tabular} {c| c c} 
+ Node & Rank at Iter. 2 & PR \\ [0.5ex] 
+ \hline
+ 1&6&8\\
+ 2&6&6\\
+ 3&4&5\\
+ 4&4&4\\
+ 5&2&2\\
+ 6&6&6\\
+ 7&3&3\\
+ 8&1&1\\
+ \end{tabular}
+ \label{Table:PR and summ}
+\end{table}
 
 \subsection{Why the Power Method}
 
@@ -352,28 +369,57 @@ This base set can become very large and so in practice a maximum number of inlin
 
 The base set is constructed in this manner due to several considerations. Firstly a good authority page may not contain the query term  as there may be synonyms more commonly used, also if the root set contains a good hub set, this expansion means that the base set will then containing good authority pages that it may not have captured previously. The base set then forms the Neighbourhood Graph N, which is then used in the computation of the authority and hub scores for all pages in N.
 
-The first step in the weight-propagation step is the formation of the adjacency matrix \textbf{L}, where \(\textbf{L}_{ij} = \begin{cases} 1, & \textnormal{if there exists an edge from node \textit{i} to node \textit{j}}\\ 0 & \textnormal{otherwise}
-\end{cases}\). If we use the example in Figure \ref{Example}, we are able to generate the following adjacency matrix:
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2cm,
+                    semithick]
+\tikzstyle{every state}=[fill=white,draw=black,text=black]
+\node[state] (1) [ultra thick] {$1$};
+\node[state] (2) [right of=1] {$2$};
+\node[state] (3) [right of=2] {$3$};
+\node[state] (4) [below of=1] {$4$};
+\node[state] (5) [ultra thick, below of=3] {$5$};
+\node[state] (6) [below of=4] {$6$};
+\node[state] (8) [below of=5] {$8$};
+\path (1) edge node{} (2)
+          edge node{} (4)
+          edge [bend right] node{} (6)
+      (2) edge node{} (5)
+      (3) edge node{} (5)
+      (4) edge node{} (5)
+      (5) edge [bend right] node{} (8)
+      (8) edge [bend right] node{} (5);
+          
+\end{tikzpicture}
+\caption{Neighbourhood graph, N,  for {1,5}}
+\end{figure}
+
+The first step in the weight-propagation step is the formation of the adjacency matrix \textbf{L}, where \[\textbf{L}_{ij} = \begin{cases} 1, & \textnormal{if there exists an edge from node \textit{i} to node \textit{j}}\\ 0 & \textnormal{otherwise}
+\end{cases}\]
+If we use the example in Figure \ref{Example} as N, we are able to generate the following adjacency matrix:
 \begin{equation}
 \textbf{L}=\left(
 \begin{array}{cccccccc}
 0 & 1 & 0 & 1 & 0 & 1 & 0 & 0 \\
 0 & 0 & 1 & 0 & 1 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 1 & 0 \\
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
-0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 1 & 0 & 0 & 1 & 1 \\
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 1 & 0 \\
 \end{array}
 \right)
 \end{equation}
 
-We are able to represent Equations \eqref{eq:HITS1} as \begin{equation}
+We are able to represent Equations \eqref{eq:HITS1} as \begin{equation} \label{eq:HITSMatrix}
 \textbf{x}^{(k)} = \textbf{L}^T\textbf{y}^{(k-1)}\quad\mathrm{and}\quad \textbf{y}^{(k)}=\textbf{Lx}^{(k)}
 \end{equation} where \(\textbf{x}^{(k)}\) and \(\textbf{y}^{(k)}\) are \(\textit{n}\) x1 vectors holding the approximate authority and hub scores at each iteration respectively. 
 
-In the original algorithm, 
+In the original algorithm, we first initialise $\textbf{y}^{(0)}$ = \textbf{e}, where \textbf{e} is the column vector of all ones, and then apply Equations \eqref{eq:HITSMatrix} until convergence.  We are able to simplify Equations \eqref{eq:HITSMatrix} to \begin{equation} \label{eq:HITSSimplify}
+\textbf{x}^{(k)} = \textbf{L}^T\textbf{Lx}^{(k-1)}\quad\mathrm{and}\quad \textbf{y}^{(k)}=\textbf{LL}^T\textbf{y}^{(k-1)}
+\end{equation}This is the iterative power method on the matrices $\textbf{L}^T\textbf{L}$ and $\textbf{LL}^T$ respectively. The HITS algorithm defines the matrix $\textbf{L}^T\textbf{L}$ as the Authority matrix, and $\textbf{LL}^T$ as the Hub matrix, and so when we apply the power method to these matrices, we compute the authority vector \textbf{x}, which contains the authority scores for all pages in the base set, and the hub vector, \textbf{y}, which similarly contains the hub scores. 
+Using Figure \ref{Example} again as an example, we are able to produce the following matrices;
 \begin{equation}
 \textnormal{Authority matrix} = \textbf{L}^T\textbf{L}=\left(
 \begin{array}{cccccccc}
@@ -398,10 +444,11 @@ In the original algorithm,
 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 \\
 1 & 0 & 0 & 1 & 1 & 3 & 0 & 1 \\
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 1 & 0 & 2 & 0 & 1 & 0 & 2 \\
+0 & 1 & 1 & 2 & 0 & 1 & 0 & 2 \\
 \end{array}
 \right)
-\end{equation}
+\end{equation} We can note that these matrices are symmetric, positive semi-definite and nonnegative, also HITS with normalization will always converge, with as few as 5 iterations required in order to compute fairly accurate ranking lists \cite{manning}. 
+
 Using matlab code as given in Appendix \ref{app:code}, we are able to compute authority score \textbf{x}, and hub score, \textbf{y}, vectors;
 \begin{eqnarray}
 \textbf{x}^T = \left( \begin{array} {cccccccc}
@@ -412,7 +459,37 @@ Using matlab code as given in Appendix \ref{app:code}, we are able to compute au
 \end{array}\right)
 \end{eqnarray}
 
+\begin{table}[H] \caption{HITS Authority and Hub rankings}
+ \centering
+ \begin{tabular} {c| c c} 
+ Node & Authority & Hub \\ [0.5ex] 
+ \hline
+ 1&8&6\\
+ 2&6&4\\
+ 3&5&5\\
+ 4&3&1\\
+ 5&1&7\\
+ 6&6&3\\
+ 7&2&8\\
+ 8&4&1\\
+ \end{tabular}
+ \label{Table:HITS}
+\end{table}
+
 As we form \textbf{L} through the base set, the order of \textbf{L} is much smaller then the total number of pages on the web, and so the computation required in producing a ranked list of the web pages is less costly than the computation in PR, we also do not need to compute eigenvectors for both matrices, as we are able to use the equations, which is also computationally simpler.
+
+\subsection{Modifications}
+However, a problem can arise with the uniqueness of the vectors produced, as different authority and hub vectors are computed by different choices of the initial vector \cite{langville}. HITS converges to a nonunique solution as the authority matrix is not irreducible, we are able to modify HITS in a manner similar to the primitivity adjustment in PR, as discussed in section \ref{sec:matrix}. In this modification, we can create a modified authority matrix \(\xi\textbf{L}^T\textbf{L} +\frac{(1-\xi)}{n}\textbf{ee}^T\) can be created, where $0<\xi<1$ \cite{langville}, and similarly create a hub matrix, \(\xi\textbf{LL}^T +\frac{(1-\xi)}{n}\textbf{ee}^T\) . These modified matrices are now irreducible, and by the Perron-Frobenius theorem, we can find a unique, normalised, positive dominant eigenvector \cite{meyer2000matrix}. Taking $\xi$ as 0.85; 
+\begin{eqnarray}
+\textbf{x}^T = \left( \begin{array} {cccccccc}
+0 & 0.030 & 0.069 & 0.118 & 0.343 &0.030 &0.305 &0.106
+\end{array}\right) \\
+\textbf{y}^T = \left( \begin{array} {cccccccc}
+0.062 & 0.144 & 0.120 & 0.226 & 0.037 & 0.185 & 0 & 0.226
+\end{array}\right)
+\end{eqnarray}
+
+This adjustment also solves the problem arising with pages having the same rank, for example in Table \ref{Table:HITS}, nodes 2 and 6 both have the same rank in terms of their authority. 
 \section{SALSA method} \label{sec:SALSA}
 \begin{figure}[H]
 \centering
@@ -544,14 +621,14 @@ Global Hub and Authority scores:
  \multirow{2}{*}{Node} & \multirow{2}{*}{PR} & \multicolumn{2}{|c|}{HITS} & \multicolumn{2}{|c}{SALSA} \\ [0.5ex] 
  {}&{}&Authority & Hub & Authority & Hub\\ 
  \hline
- 1&8&1&3&8&6\\
- 2&6&3&6&6&4\\
- 3&5&7&6&5&5\\
- 4&4&3&3&3&1\\
- 5&2&7&1&1&7\\
- 6&6&1&6&6&3\\
- 7&3&3&2&2&8\\
- 8&1&3&3&4&1\\
+ 1&8&8&6&8&6\\
+ 2&6&6&4&6&4\\
+ 3&5&5&5&5&5\\
+ 4&4&3&1&3&1\\
+ 5&2&1&7&1&7\\
+ 6&6&6&3&6&3\\
+ 7&3&2&8&2&8\\
+ 8&1&4&1&4&1\\
  \end{tabular}
  \label{comparison}
 \end{table}
@@ -656,7 +733,7 @@ when we compare the PageRankings produced by performing the standard algorithm a
  7&3&5\\
  8&1&2\\
  \end{tabular}
- \label{comparison}
+ \label{Table:WPR and PR}
 \end{table}
 \cite{langville}, , \cite{baeza2004web}
 
