@@ -55,7 +55,6 @@
 
 \begin{document}
 
-
 %--------------------Title Page
 \maketitle
 \begin{abstract}
@@ -121,7 +120,7 @@ quotations and paraphrases suitably indicated.}
 
 %--------------------Introduction
 
-\chapter{Introduction}
+\chapter{Introduction}\label{chap:intro}
 Google's PageRank algorithm, developed in 1998 by Sergey Brin and Larry Page is one of the most well-known and influential methods of ranking web pages. The hyperlink structure of the web is represented by a directed graph, with the web pages representing the nodes and the links between nodes being the hyperlinks. Inlinks are pages that point into nodes, and outlinks point out from nodes \cite{brin1998anatomy}. The algorithm in its simplest form aims to rank pages with the assumption that a web page's importance is reliant on other important pages linking to it. When this is represented mathematically, it becomes clear that the importance scores of the web pages relate to the stationary points of a Markov chain, and hence Markov theory and matrices can be used to solve the PageRank equation:
 \begin{equation}
 \boldsymbol{\pi} = \boldsymbol{\pi} \cdot \textbf{G}
@@ -156,16 +155,16 @@ where \textbf{G} is the 'Google Matrix' and $\boldsymbol{\pi}$ is the set of ran
           edge node{} (7);
           
 \end{tikzpicture}
-\caption{Graph modelling 8-node web} \label{Example}
+\caption{Graph modelling 8-node web} \label{fig:Example}
 \end{figure}
 
-In the first chapter of this report, we will explore mathematical representations of the PageRank equation, the modifications required on the matrix in order to use Markov theory to solve the PageRank equation, and finally on the use of the power method to solve the equation. Chapter 3 will then explore improvements to the PageRank representation that could increase the accuracy and personalise the PageRank method for a user, such as weighted PageRank and topic-specific PageRank. Chapter 4 discusses other methods of ranking web pages, and compares these to PageRank. Chapter 5 explores potential applications for PageRank beyond ranking web-pages, for example in predicting traffic flow in Durham. The final chapter of the report, Chapter 6, summarises the main points of the report.
+In the first chapter of this report, we will explore mathematical representations of the PageRank equation, the modifications required on the matrix in order to use Markov theory to solve the PageRank equation, and finally on the use of the power method to solve the equation. Chapter \ref{chap:Other} discusses other methods of ranking web pages, and compares these to PageRank. Chapter \ref{chap:Improve} will then explore improvements to the PageRank representation that could increase the accuracy and personalise the PageRank method for a user, such as weighted PageRank and topic-specific PageRank. Chapter \ref{chap:Applications} explores potential applications for PageRank beyond ranking web-pages, for example in predicting traffic flow in Durham. The final chapter of the report, Chapter \ref{chap:Conclusion}, summarises the main points of the report.
 
 
 
 %--------------------Matrix Representation 
-\chapter{Mathematical Representation} \label{ch:Math}
-In this chapter we aim to represent the PageRank equation mathematically, in section 2.1, we use summation formulas to represent the algorithm, and introduce the idea of an iterative process to compute the PageRank vector. In section 2.2 we represent the PageRank equation using matrices, and discuss the two adjustments required in order to use Markov theory to solve the PageRank equation leading to the formation of a dense Google Matrix. We will discuss the use of the power method to solve the PageRank equation in section 2.3.
+\chapter{Mathematical Representation} \label{chap:Math}
+In this chapter we aim to represent the PageRank equation mathematically, in Section \ref{sec:summ}, we use summation formulas to represent the algorithm, and introduce the idea of an iterative process to compute the PageRank vector. In Section \ref{sec:matrix} we represent the PageRank equation using matrices, and discuss the two adjustments required in order to use Markov theory to solve the PageRank equation leading to the formation of a dense Google Matrix. We will discuss the use of the power method to solve the PageRank equation in Section \ref{sec:solve}.
 
 The references Austin \cite{austin}, Bonato \cite{bonato} and Langville \cite{langville} were consulted during the writing of this chapter, and the material has been collated below.  
 
@@ -173,11 +172,11 @@ The references Austin \cite{austin}, Bonato \cite{bonato} and Langville \cite{la
 In order to mathematically represent the PageRank algorithm, Brin and Page first assigned each page, $P_i$, a rank
 \begin{equation}
 r(P_i) = \displaystyle \sum_{P_j\in B_{P_i }} \frac{r(P_j)}{|P_j|}
-\end{equation} where $B_{P_i}$ is the set of pages pointing into $P_i$, and $\vert P_j\vert$ is the number of outlinks from a page. However the ranking of outlinks is unknown, and so an iterative summation formula is required, where it is assumed that all pages have equal PageRank at the start, \(r_o = \frac{1}{n}\) , \begin{equation} \label{iterative}
+\end{equation} where $B_{P_i}$ is the set of pages pointing into $P_i$, and $\vert P_j\vert$ is the number of outlinks from a page. However the ranking of outlinks is unknown, and so an iterative summation formula is required, where it is assumed that all pages have equal PageRank at the start, \(r_o = \frac{1}{n}\) , \begin{equation} \label{eq:iterative}
 r_{(k+1)}P_i = \displaystyle \sum_{P_j\in B_{P_i }}\frac{r_k(P_j)}{|P_j|}
-\end{equation} When \eqref{iterative} is applied to all pages in the graph, you can calculate a ranking for the pages, so for the graph in figure \ref{Example}, we get the following values for the PageRanks after some iterations: 
+\end{equation} When Equation \eqref{eq:iterative} is applied to all pages in the graph, you can calculate a ranking for the pages, so for the graph in Figure \ref{fig:Example}, we get the following values for the PageRanks after some iterations: 
 
-\begin{table}[H] \caption{First iterates using \eqref{iterative} on Figure \ref{Example}}
+\begin{table}[H] \caption{First iterates using Equation \eqref{eq:iterative} on Figure \ref{fig:Example}}
  \centering
  \begin{tabular} {c c c |c} 
  Iter. 0 & Iter. 1 & Iter. 2 &  Rank at Iter. 2 \\ [0.5ex] 
@@ -196,7 +195,7 @@ r_{(k+1)}P_i = \displaystyle \sum_{P_j\in B_{P_i }}\frac{r_k(P_j)}{|P_j|}
 \section{Matrix Representation} \label{sec:matrix}
 \subsection{Hyperlink Matrix} \label{sec:hyperlink}
 If we represent the PageRank algorithm using matrices, we are able to compute a 1 x \textit{n} row vector, $\boldsymbol{\pi}^T$, the PageRank vector, at each iteration which contains the PageRank values for all web pages in the hyperlink graph. In order to do this we first introduce the concept of the Hyperlink matrix, a [\textit{n}x\textit{n}] matrix \textbf{H}, which is a row normalized matrix where 
-\(\boldsymbol{H_{ij}} = \begin{cases} \frac{1}{\vert P_j \vert} & P_j\in B_{P_i } \\ 0 & \textnormal{otherwise} \end{cases}\). So for Figure \ref{Example} we are able to produce 
+\(\boldsymbol{H_{ij}} = \begin{cases} \frac{1}{\vert P_j \vert} & P_j\in B_{P_i } \\ 0 & \textnormal{otherwise} \end{cases}\). So for Figure \ref{fig:Example} we are able to produce 
 \[\textbf{H}=\left(
 \begin{array}{cccccccc}
 0 & \frac{1}{3} & 0 & \frac{1}{3} & 0 &\frac{1}{3} & 0& 0 \\
@@ -212,7 +211,7 @@ If we represent the PageRank algorithm using matrices, we are able to compute a 
 
 The non-zero elements of row \textit{i} relate to the outlinking pages of $P_i$, for example, node 1 has outlinks to pages 2, 4 and 6, and so in columns 2, 4 and 6 of \textbf{H} the value in row 1 are $\frac{1}{3}$ and the non-zero elements of column \textit{i} relates to the inlinking pages.
 
-We are able to write \eqref{iterative} as \begin{equation} \label{power H}
+We are able to write Equation \eqref{eq:iterative} as \begin{equation} \label{eq:power H}
 \boldsymbol\pi^{(k+1)T} = \boldsymbol\pi^{(k)T}\textbf{H}
 \end{equation}  which shows that the vector $\boldsymbol\pi^T$ is an eigenvector of the matrix \textbf{H} with eigenvalue 1, otherwise known as the stationary vector of \textbf{H}, essentially this is the classical power method applied to \textbf{H}. We are able to observe that \textbf{H} is a very sparse matrix, as the majority of its entries are 0, which is computationally very beneficial, as it reduces the vector-matrix multiplication at each iteration to a linear computation. The formation of \textbf{H} is very similar to the formation of a transition probability matrix for a Markov chain, and it is also noted that \textbf{H} is similar to a stochastic matrix, as all entries are non-negative, however not all rows sum to 1.
 
@@ -229,8 +228,8 @@ From Markov theory, we know that for any starting vector, the power method appli
           edge [bend right] node{} (3)
       (3) edge [bend right] node{} (1)
           edge node{} (2);
-\end{tikzpicture} \caption{Simple graph with rank sink} \label{dangling} 
-\end{figure} in Figure \ref{dangling}, node 2 is a dangling node. There can also be an issue with cycles,
+\end{tikzpicture} \caption{Simple graph with rank sink} \label{fig:dangling} 
+\end{figure} in Figure \ref{fig:dangling}, node 2 is a dangling node. There can also be an issue with cycles,
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2cm,
@@ -240,15 +239,15 @@ From Markov theory, we know that for any starting vector, the power method appli
 \node[state] (2) [right of=1] {$2$};
 \path (1) edge [bend right] node{} (2)
       (2) edge [bend right] node{} (1);
-\end{tikzpicture} \caption{Simple graph with cycle} \label{cycle}
-\end{figure} for example in Figure \ref{cycle}, an infinite loop is created between nodes 1 and 2, and so the iterate will not converge. We are able to apply modifications to \textbf{H} which make it a Markov matrix.
+\end{tikzpicture} \caption{Simple graph with cycle} \label{fig:cycle}
+\end{figure} for example in Figure \ref{fig:cycle}, an infinite loop is created between nodes 1 and 2, and so the iterate will not converge. We are able to apply modifications to \textbf{H} which make it a Markov matrix.
 
-\subsection{Stochastic Matrix}
-The first modification, called the stochasticity adjustment, leads to the formation of a stochastic matrix, \textbf{S}. In the stochasticity adjustment, we change rows of 0's to rows of $\frac{1}{n}$, hence making \textbf{S} stochastic, as all rows now sum to 1. Mathematically this is shown as, \begin{equation} \label{s}
+\subsection{Stochastic Matrix} \label{sec:stoc}
+The first modification, called the stochasticity adjustment, leads to the formation of a stochastic matrix, \textbf{S}. In the stochasticity adjustment, we change rows of 0's to rows of $\frac{1}{n}$, hence making \textbf{S} stochastic, as all rows now sum to 1. Mathematically this is shown as, \begin{equation} \label{eq:s}
 \textbf{S} = \textbf{H} + \textbf{a}\left(\frac{1}{n}\cdot 1^{T}\right)
 \end{equation} where \textbf{a} is the dangling node vector, \(\boldsymbol{a} = \begin{cases} 1 & \textnormal{if dangling node} \\ 0 & \textnormal{otherwise} \end{cases}\), and $1^T$ is the rank 1 matrix with unit entries of size [1x\textit{n}].
 
-In terms of the random surfer idea as mentioned in section 1.1, this means that if the surfer enters a dangling node, it is able to teleport to another page in the graph at random. For the 8-node graph example in Figure \ref{Example}, we produce  
+In terms of the random surfer idea as mentioned in section 1.1, this means that if the surfer enters a dangling node, it is able to teleport to another page in the graph at random. For the 8-node graph example in Figure \ref{fig:Example}, we produce  
 \[\textbf{S}=\left(
 \begin{array}{cccccccc}
 0 & \frac{1}{3} & 0 & \frac{1}{3} & 0 &\frac{1}{3} & 0& 0 \\
@@ -264,28 +263,27 @@ In terms of the random surfer idea as mentioned in section 1.1, this means that 
 
 The stochasticity adjustment is especially crucial when modelling the web in practice, as in an analysis of a significant section of the web graph, only a quarter of the web is strongly connected, and so a large majority of the web are dangling nodes \cite{chakrabarti2002mining}.
 
-\subsection{Google Matrix}
-The primitivity adjustment is the next modification to the matrix which ensures that it is both aperiodic and irreducible. This modification introduces a scaling parameter $\alpha \in [0,1]$. In terms of the random surfer, this adjustment means that most of the time the surfer will follow links from page $P_i$ to $P_j$, however at any time the surfer could choose a page uniformly at random from the graph and jump there. This adjustment is shown by \begin{equation}\label{G}
+\subsection{Google Matrix}\label{sec:google}
+The primitivity adjustment is the next modification to the matrix which ensures that it is both aperiodic and irreducible. This modification introduces a scaling parameter $\alpha \in [0,1]$. In terms of the random surfer, this adjustment means that most of the time the surfer will follow links from page $P_i$ to $P_j$, however at any time the surfer could choose a page uniformly at random from the graph and jump there. This adjustment is shown by \begin{equation}\label{eq:G}
 \textbf{G}=\alpha\textbf{S}+\left((1-\alpha)\cdot\frac{1}{n}\cdot1^T\right)
-\end{equation} where \textbf{G} is the Google matrix. For Figure \ref{Example},
+\end{equation} where \textbf{G} is the Google matrix. For Figure \ref{fig:Example},
 \[\textbf{G}=\alpha\textbf{S}+\left((1-\alpha)\cdot \frac{1}{8} \cdot \left(  \begin{array}{cccccccc}
 1&1&1&1&1&1&1&1\end{array}\right) \right)\]
 
-Due to the primitivity adjustment, \textbf{G} is stochastic, as it is the combination of two stochastic matrices, irreducible and aperiodic. This implies that the power method applied to \textbf{G} is guaranteed to converge to a stationary vector $\boldsymbol{\pi}^T$. \begin{equation}\label{power to G}
+Due to the primitivity adjustment, \textbf{G} is stochastic, as it is the combination of two stochastic matrices, irreducible and aperiodic. This implies that the power method applied to \textbf{G} is guaranteed to converge to a stationary vector $\boldsymbol{\pi}^T$. \begin{equation}\label{eq:power to G}
 \boldsymbol{\pi}^{(k+1)T} = \boldsymbol{\pi}^{(k)T}\textbf{G}
 \end{equation} However, \textbf{G} is artificial, as it has been modified twice in order to assure convergence, also \textbf{G} is dense, which is a computational disadvantage, this can be solved by expressing \textbf{G} in terms of \textbf{H}, a very sparse matrix; 
-
  
 \begin{align}
 \textbf{G} & = \alpha\textbf{S}+\left((1-\alpha)\cdot\frac{1}{n}\cdot1^T\right)\notag\\
 & = \alpha \left(\textbf{H} + \textbf{a}\left(\frac{1}{n}\cdot 1^{T}\right)\right) + \left((1-\alpha)\cdot\frac{1}{n}\cdot1^T\right)\notag\\
-& = \alpha\textbf{H} + (\alpha\textbf{a} +(1-\alpha))\left(\frac{1}{n}\cdot 1^T\right)\label{G in H}
+& = \alpha\textbf{H} + (\alpha\textbf{a} +(1-\alpha))\left(\frac{1}{n}\cdot 1^T\right)\label{eq:G in H}
 \end{align}
 
-\subsection{$\alpha$ parameter}
+\subsection{$\alpha$ parameter} \label{sec:alpha}
 The $\alpha$ parameter introduced in the primitivity adjustment controls how much the original hyperlink structure of the web is weighted. As $\alpha \rightarrow 1$ the expected number of iterations required before convergence increases as the PageRank vector is more volatile, however artificiality is low, and we are close to working with the original hyperlink graph. When $\alpha =0$ then $\textbf{G}=\frac{1}{n}\cdot 1^T$, so there is a link between every page, and so the hyperlink structure has completely disappeared. 
 
-Brin and Page suggested the value of 0.85, as this strikes a balance between efficiency and effectiveness. Using Figure \ref{Example} and \eqref{G in H}, we obtain
+Brin and Page suggested the value of 0.85, as this strikes a balance between efficiency and effectiveness. Using Figure \ref{fig:Example} and Equation \eqref{eq:G in H}, we obtain
 \begin{equation}
 \textbf{G} = \left(
 \begin{array}{cccccccc}
@@ -300,12 +298,12 @@ Brin and Page suggested the value of 0.85, as this strikes a balance between eff
 \end{array}
 \right)
 \end{equation}
-\section{Solving the PageRank Equation}
+\section{Solving the PageRank Equation} \label{sec:solve}
 In order to solve the PageRank equation we either need to solve the eigenvector problem for $\boldsymbol{\pi}^T$, \(\boldsymbol{\pi}^T = \boldsymbol{\pi}^T\textbf{G}\), i.e. we need to find a normalized dominant left-hand eigenvector of \textbf{G} which corresponds to the dominant eigenvalue of $\lambda_1 = 1$. We are also able to solve the equation by using a linear system \(\boldsymbol{\pi}^T(\textbf{I}-\textbf{G})=\textbf{0}^T\), where we want to find a normalized left-hand vector of \textbf{I}-\textbf{G}, \cite{langville}. We will discuss the power method in more detail in this report, as this is the original method proposed to solve the PageRank equation \cite{langville}.
 
 
 \cite{ipsen2005analysis}, \cite{page1999pagerank}
-\subsection{Power Method}
+\subsection{Power Method} \label{sec:power}
 PERRON-FROBENIUS \cite{meyer2000matrix}
 \textcolor{red}{\textbf{EXPLAIN MATHS MORE HERE}}
 
@@ -341,25 +339,25 @@ Using matlab code as given in Appendix \ref{app:code},
  \label{Table:PR and summ}
 \end{table}
 
-\subsection{Why the Power Method}
+\subsection{Why the Power Method}\label{sec:why power}
 
-The power method is useful for solving the PageRank equation as it converges to a unique vector, the PageRank vector, where the $i^{th}$ entry of $\boldsymbol\pi$ relates to the PageRank of \textit{i} \cite{ipsen2005analysis}. The main disadvantage of the power method is that it known to be very slow to converge, with the computation of the PageRank vector taking a few days to complete for the large web graph, but the power method is very simple. As we are able to simplify G to H as shown in \eqref{G in H}, the power method is very storage friendly, this is as for an iteration only a sparse \textbf{H}, a dangling node vector \textbf{a} and the current iterate are required to be stored \cite{langville}. Brin and Page reported that the PageRank vector converges to 2-3 degrees of accuracy within 50-100 iterations \cite{austin}.
+The power method is useful for solving the PageRank equation as it converges to a unique vector, the PageRank vector, where the $i^{th}$ entry of $\boldsymbol\pi$ relates to the PageRank of \textit{i} \cite{ipsen2005analysis}. The main disadvantage of the power method is that it known to be very slow to converge, with the computation of the PageRank vector taking a few days to complete for the large web graph, but the power method is very simple. As we are able to simplify \textbf{G} to \textbf{H} as shown in Equation \eqref{eq:G in H}, the power method is very storage friendly, this is as for an iteration only a sparse \textbf{H}, a dangling node vector \textbf{a} and the current iterate are required to be stored \cite{langville}. Brin and Page reported that the PageRank vector converges to 2-3 degrees of accuracy within 50-100 iterations \cite{austin}.
 
 
 %--------------------Comparison to other methods of Ranking webpages
-\chapter{Other Methods of Ranking Web Pages}
+\chapter{Other Methods of Ranking Web Pages}\label{chap:Other}
 
-Whilst PR is the most influential algorithm for ranking webpages, there are many other algorithms that are well known. In this chapter we will discuss two such algorithms, the HITS algorithm which also ranks webpages by popularity \cite{kleinberg1999authoritative}. However HITS differs as it produces two scores for each webpage. HITS has been used in the search engine Ask.com \cite{bonato}, and expands upon the idea of using connectivity analysis too identify high quality pages within a topic specific graph \cite{manning}. We will also discuss the SALSA algorithm, which incorporates ideas from both HITS and PR, as it assigns two scores to each web pages, but uses Markov theory as in PR \cite{lempel2000stochastic}. 
 
+Whilst PR is the most influential algorithm for ranking webpages, there are many other algorithms that are well known. In this chapter we will discuss two such algorithms, Section \ref{sec:HITS} will discuss the HITS algorithm which also ranks webpages by popularity \cite{kleinberg1999authoritative}. However HITS differs as it produces two scores for each webpage. HITS has been used in the search engine Ask.com \cite{bonato}, and expands upon the idea of using connectivity analysis too identify high quality pages within a topic specific graph \cite{manning}. We will also discuss the SALSA algorithm in Section \ref{sec:SALSA}, which incorporates ideas from both HITS and PR, as it assigns two scores to each web pages, but uses Markov theory as in PR \cite{lempel2000stochastic}. We will focus on the strengths and weaknesses of these two algorithms, and compare these methods of ranking webpages to PR in Section \ref{sec:compare}.
 
 References: \cite{baldi2003modeling}, \cite{bharat1998improved}, \cite{bonato}, \cite{ding2003pagerank}, \cite{farahat2006authority}, \cite{langville}, \cite{manning}, \cite{ng2001link}, \cite{ng2001stable}
 
-\section{HITS Algorithm}
-The Hypertext Induced Topic Search (HITS) algorithm was developed by Jon Kleinburg, and is similar to PR as it ranks web pages by popularity, however HITS produces two popularity scores, for each webpage. The HITS algorithm defines an authoritative page as a page with sources of information on a topic, while a hub is a page that is not in itself a source of information, but compilations to authoritative pages \cite{manning}. Authoritative pages have many inlinks, a hub is a page which has many outlinks, each webpage on a graph has some measure of an authority and some measure of a hub. A good authority is one which is pointed to by good hubs, whilst a good hub is one which points to good authorities. This cyclic definition is similar to the definition for PR, and we use an iterative computation in order to rank the webpages.
+\section{HITS Algorithm} \label{sec:HITS}
+The Hypertext Induced Topic Search (HITS) algorithm was developed by Jon Kleinburg, and is similar to PR as it ranks web pages by popularity, however HITS produces two popularity scores, for each webpage.  Kleinburg developed this algorithm as a connectivity analysis on a hyperlinked environment. The HITS algorithm defines an authoritative page as a page with sources of information on a topic, while a hub is a page that is not in itself a source of information, but compilations to authoritative pages \cite{manning}. Authoritative pages have many inlinks, a hub is a page which has many outlinks, each webpage on a graph has some measure of an authority and some measure of a hub. A good authority is one which is pointed to by good hubs, whilst a good hub is one which points to good authorities. This cyclic definition is similar to the definition for PR, and we use an iterative computation in order to rank the webpages.
 
 Authorities are pages with good coverage of a topic, hubs are pages with links to many useful pages on a topic \cite{bonato}. HITS was developed as a way to combat two problems that can occur when ranking webpages, these are the scarcity problem, where not many pages contain the exact information that you desire, and it can be difficult to identify these webpages. The second problem that can occur is the abundance problem, where the number of pages that are returned to the user as being relevant to the query is too much for the human user to digest. The algorithm distils a broad topic down to a representation of a very small size \cite{kleinberg1999authoritative}
 
-\subsection{HITS Implementation}
+\subsection{HITS Implementation} \label{sec:HITS implementation}
 The HITS algorithm consists of two steps, the first step builds a neighbourhood graph, N, which is related to the query term, this step is known as the sampling step. The second step, the weight-propagation step, involves the computation of the authority and hub scores for each page, two ranked lists are then presented to the user. This computation is an iterative calculation, where firstly each page is assigned initial authority score $x_i^{(0)}$ and initial hub score $y_i^{(0)}$, which are redefined by computing \begin{equation} \label{eq:HITS1}
 x_i^{(k)} = \displaystyle \sum_{j:e_{ij}\in E} y_j^{(k-1)} \quad\mathrm{and}\quad y_i^{(k)} = \displaystyle \sum_{j:e_{ij}\in E} x_j^{(k)}  \quad\mathrm{for}\quad k=1,2,3\ldots
 \end{equation}
@@ -396,8 +394,8 @@ The base set is constructed in this manner due to several considerations. Firstl
 
 The first step in the weight-propagation step is the formation of the adjacency matrix \textbf{L}, where \[\textbf{L}_{ij} = \begin{cases} 1, & \textnormal{if there exists an edge from node \textit{i} to node \textit{j}}\\ 0 & \textnormal{otherwise}
 \end{cases}\]
-If we use the example in Figure \ref{Example} as N, we are able to generate the following adjacency matrix:
-\begin{equation}
+If we use the example in Figure \ref{fig:Example} as N, we are able to generate the following adjacency matrix:
+\begin{equation*}
 \textbf{L}=\left(
 \begin{array}{cccccccc}
 0 & 1 & 0 & 1 & 0 & 1 & 0 & 0 \\
@@ -410,7 +408,7 @@ If we use the example in Figure \ref{Example} as N, we are able to generate the 
 0 & 0 & 0 & 0 & 1 & 0 & 1 & 0 \\
 \end{array}
 \right)
-\end{equation}
+\end{equation*}
 
 We are able to represent Equations \eqref{eq:HITS1} as \begin{equation} \label{eq:HITSMatrix}
 \textbf{x}^{(k)} = \textbf{L}^T\textbf{y}^{(k-1)}\quad\mathrm{and}\quad \textbf{y}^{(k)}=\textbf{Lx}^{(k)}
@@ -419,9 +417,10 @@ We are able to represent Equations \eqref{eq:HITS1} as \begin{equation} \label{e
 In the original algorithm, we first initialise $\textbf{y}^{(0)}$ = \textbf{e}, where \textbf{e} is the column vector of all ones, and then apply Equations \eqref{eq:HITSMatrix} until convergence.  We are able to simplify Equations \eqref{eq:HITSMatrix} to \begin{equation} \label{eq:HITSSimplify}
 \textbf{x}^{(k)} = \textbf{L}^T\textbf{Lx}^{(k-1)}\quad\mathrm{and}\quad \textbf{y}^{(k)}=\textbf{LL}^T\textbf{y}^{(k-1)}
 \end{equation}This is the iterative power method on the matrices $\textbf{L}^T\textbf{L}$ and $\textbf{LL}^T$ respectively. The HITS algorithm defines the matrix $\textbf{L}^T\textbf{L}$ as the Authority matrix, and $\textbf{LL}^T$ as the Hub matrix, and so when we apply the power method to these matrices, we compute the authority vector \textbf{x}, which contains the authority scores for all pages in the base set, and the hub vector, \textbf{y}, which similarly contains the hub scores. 
-Using Figure \ref{Example} again as an example, we are able to produce the following matrices;
-\begin{equation}
-\textnormal{Authority matrix} = \textbf{L}^T\textbf{L}=\left(
+Using Figure \ref{fig:Example} again as an example, we are able to produce the following matrices;
+\begin{equation*}
+%\textnormal{Authority matrix} =
+\textbf{L}^T\textbf{L}=\left(
 \begin{array}{cccccccc}
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
 0 & 1 & 0 & 1 & 0 & 1 & 0 & 0 \\
@@ -433,9 +432,10 @@ Using Figure \ref{Example} again as an example, we are able to produce the follo
 0 & 0 & 0 & 1 & 0 & 0 & 1 & 2 \\
 \end{array}
 \right)
-\end{equation}
-\begin{equation}
-\textnormal{Hub matrix} = \textbf{LL}^T=\left(
+\end{equation*}
+\begin{equation*}
+%\textnormal{Hub matrix} =
+\textbf{LL}^T=\left(
 \begin{array}{cccccccc}
 3 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
 0 & 2 & 1 & 1 & 0 & 0 & 0 & 1 \\
@@ -447,9 +447,9 @@ Using Figure \ref{Example} again as an example, we are able to produce the follo
 0 & 1 & 1 & 2 & 0 & 1 & 0 & 2 \\
 \end{array}
 \right)
-\end{equation} We can note that these matrices are symmetric, positive semi-definite and nonnegative, also HITS with normalization will always converge, with as few as 5 iterations required in order to compute fairly accurate ranking lists \cite{manning}. 
+\end{equation*} We can note that these matrices are symmetric, positive semi-definite and nonnegative, also HITS with normalization will always converge, with as few as 5 iterations required in order to compute fairly accurate ranking lists \cite{manning}. 
 
-Using matlab code as given in Appendix \ref{app:code}, we are able to compute authority score \textbf{x}, and hub score, \textbf{y}, vectors;
+Using the power method and the Equations \eqref{eq:HITSSimplify}, as described by the Matlab code given in Appendix \ref{app:code}, we are able to compute authority score \textbf{x}, and hub score, \textbf{y}, vectors;
 \begin{eqnarray}
 \textbf{x}^T = \left( \begin{array} {cccccccc}
 0 & 0.030 & 0.069 & 0.118 & 0.343 &0.030 &0.305 &0.106
@@ -457,9 +457,9 @@ Using matlab code as given in Appendix \ref{app:code}, we are able to compute au
 \textbf{y}^T = \left( \begin{array} {cccccccc}
 0.062 & 0.144 & 0.120 & 0.226 & 0.037 & 0.185 & 0 & 0.226
 \end{array}\right)
-\end{eqnarray}
+\end{eqnarray} Hence we are able to produce two ranked lists for the user in terms of the authority and hub values of the pages in N, as shown in Table \ref{Table:HITS}.
 
-\begin{table}[H] \caption{HITS Authority and Hub rankings}
+\begin{table}[h] \caption{HITS Authority and Hub rankings}
  \centering
  \begin{tabular} {c| c c} 
  Node & Authority & Hub \\ [0.5ex] 
@@ -476,10 +476,19 @@ Using matlab code as given in Appendix \ref{app:code}, we are able to compute au
  \label{Table:HITS}
 \end{table}
 
-As we form \textbf{L} through the base set, the order of \textbf{L} is much smaller then the total number of pages on the web, and so the computation required in producing a ranked list of the web pages is less costly than the computation in PR, we also do not need to compute eigenvectors for both matrices, as we are able to use the equations, which is also computationally simpler.
+\subsection{Strengths and Weaknesses of HITS} \label{sec:HITS adv and dis}
 
-\subsection{Modifications}
-However, a problem can arise with the uniqueness of the vectors produced, as different authority and hub vectors are computed by different choices of the initial vector \cite{langville}. HITS converges to a nonunique solution as the authority matrix is not irreducible, we are able to modify HITS in a manner similar to the primitivity adjustment in PR, as discussed in section \ref{sec:matrix}. In this modification, we can create a modified authority matrix \(\xi\textbf{L}^T\textbf{L} +\frac{(1-\xi)}{n}\textbf{ee}^T\) can be created, where $0<\xi<1$ \cite{langville}, and similarly create a hub matrix, \(\xi\textbf{LL}^T +\frac{(1-\xi)}{n}\textbf{ee}^T\) . These modified matrices are now irreducible, and by the Perron-Frobenius theorem, we can find a unique, normalised, positive dominant eigenvector \cite{meyer2000matrix}. Taking $\xi$ as 0.85; 
+An advantage of HITS compared to PR is the dual ranking that is assigned to each webpage, a user might find this useful to find out which pages are the most authoritative on a query topic. 
+
+As we form \textbf{L} through the base set, the order of \textbf{L} is much smaller then the total number of pages on the web, and so the computation required in producing a ranked list of the web pages is less costly than the computation in PR, we also do not need to compute eigenvectors for both matrices, as we are able to use the equations, which is also computationally simpler. 
+
+HITS is also query-dependant, it first generates a root set dependant on the query, and returns two real numbers for a given page HITS deems relevant to the topic, however PR returns a rank for each page in the whole web graph, this is also a weakness of the algorithm, as the computation required to produce the dual rankings must occur at query time. It is possible to make HITS query dependant by removing the sampling step of the algorithm, hence reducing computation time. 
+
+There are three main problems which can arise through using connectivity analysis on webpages, such as mutually reinforced relationships in a tightly knitted community, TKC, where a set of documents on page A could point to a single document on page B which would then drive up the hub score of page A, whilst increasing the authority ranking on page B, when this occurs in the TKC, pages that may have no authority on a topic or may pertain to just one ascpect of the query may score high undeservedly \cite{lempel2000stochastic}. There is also a problem of automatically generated links, which would not represent human opinion, also topic-drift arises through the useage of connectivity analysis, where when building N, it is possible for an authoritative page which is off-topic can be linked to pages which contain the query term, and so can skew the rankings to off-topic pages. The general solution to this problem as suggested by Bharat and Herzinger is to use content analysis \cite{bharat1998improved}. Using this improved algorithm, precision over the original HITS algorithm has been shown to increase by 45\%, however this is limited to topics that are already well-represented and connected on the web. 
+
+Topic drift has been shown to be avoided by using topic vectors to filter N, a topic vector is a term vector which has been computed from the text of pages in the base set, a page is only able to remain in N if its term vector is a good match to this topic vector. \textcolor{red}{\textbf{EXPLAIN MORE HERE}}
+
+A problem can arise with the uniqueness of the vectors produced, as different authority and hub vectors are computed by different choices of the initial vector \cite{langville}. HITS converges to a nonunique solution as the authority matrix is not irreducible, we are able to modify HITS in a manner similar to the primitivity adjustment in PR, as discussed in section \ref{sec:matrix}. In this modification, we can create a modified authority matrix \(\xi\textbf{L}^T\textbf{L} +\frac{(1-\xi)}{n}\textbf{ee}^T\) can be created, where $0<\xi<1$ \cite{langville}, and similarly create a hub matrix, \(\xi\textbf{LL}^T +\frac{(1-\xi)}{n}\textbf{ee}^T\) . These modified matrices are now irreducible, and by the Perron-Frobenius theorem, we can find a unique, normalised, positive dominant eigenvector \cite{meyer2000matrix}. Taking $\xi$ as 0.85; 
 \begin{eqnarray}
 \textbf{x}^T = \left( \begin{array} {cccccccc}
 0 & 0.030 & 0.069 & 0.118 & 0.343 &0.030 &0.305 &0.106
@@ -490,7 +499,16 @@ However, a problem can arise with the uniqueness of the vectors produced, as dif
 \end{eqnarray}
 
 This adjustment also solves the problem arising with pages having the same rank, for example in Table \ref{Table:HITS}, nodes 2 and 6 both have the same rank in terms of their authority. 
+
 \section{SALSA method} \label{sec:SALSA}
+In 2000 Ronny Lempel and Schlomo Moran developed an algorithm for ranking webpages known as the Stochastic Approach to Link Systems Analysis, SALSA, which incorporates ideas from both HITS and PR. The algorithm was developed as an attempt to avoid certain problems with HITS, such as topic drift \cite{bonato}. The algorithm is similar to HITS as it produces both authority and hub scores for the webpages in the graph, but SALSA examines random walks on two Markov chains derived from the web, similar to PR. SALSA is a query-dependant algorithm like HITS. SALSA is less vulnerable to the TKC effect which can negatively impact rankings in HITS. The random walks that SALSA examines are derived from the link structure of the web as opposed to a graph which is formed from connectivity analysis as in HITS \cite{lempel2000stochastic}. 
+
+\subsection{SALSA Implementation}\label{sec:SALSA implementation}
+The SALSA algorithm method first forms a neighbourhood graph N in a similar method to HITS, see Section \ref{sec:HITS implementation} for more details. Next a bipartite undirected graph, G, is formed. G is defined by three sets, $V_h$, the set of hub nodes, $V_a$, the set of authority nodes, and \textit{E}, which is the set of directed edges in N. Using Figure \ref{fig:Example} as an example, we find 
+\[V_h = \{2,3,4,5,6,7,8\} \]
+\[V_a = \{1,2,3,4,5,7,8\} \]
+Note a node can be in both $V_h$ and $V_a$. The bipartite graph for Figure \ref{fig:Example} is given in Figure \ref{fig:bipartite}, where the authority nodes are on the 'authority side' and similarly the hub nodes are on the 'hub side' of the graph. 
+
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}
@@ -508,10 +526,29 @@ This adjustment also solves the problem arising with pages having the same rank,
    \EdgeFromOneToSel{b}{a}{5}{3}
    \EdgeFromOneToSel{b}{a}{6}{5,3}
    \EdgeFromOneToSel{b}{a}{7}{2,4,6} 
-\end{tikzpicture}\caption{Bipartite graph of Figure \ref{Example} } \label{bipartite}
+\end{tikzpicture}\caption{Bipartite graph of Figure \ref{fig:Example} } \label{fig:bipartite}
 \end{figure}
 
-\begin{equation}
+The next step in algorithm relates to the formation of the two Markov chains used, the authority Markov chain which has a transition probabilty matrix \textbf{A}, and a hub Markov chain which has the matrix \textbf{H}. In relation to the SALSA algorithm \textbf{H} is the hub matrix, which is not to be confused with the hyperlink matrix that \textbf{H} represents in PR, as shown in Section \ref{sec:hyperlink}.  
+
+SALSA uses row and column weighting to calculate their authority and hub scores. Let $\textbf{L}_r$ be the adjacency matrix \textbf{L} with each nonzero row divided by the sum of the rows, and similarly $\textbf{L}_c$ is \textbf{L} where each non zero column is divided by the column sum.
+
+\begin{equation*}
+\textbf{L}=\left(
+\begin{array}{cccccccc}
+0 & 1 & 0 & 1 & 0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 1 & 0 & 0 & 1 & 1 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 1 & 0 \\
+\end{array}
+\right)
+\end{equation*}
+
+\begin{equation*}
 \textbf{L}_r=\left(
 \begin{array}{cccccccc}
 0 & \frac{1}{3} & 0 & \frac{1}{3} & 0 & \frac{1}{3} & 0 & 0 \\
@@ -523,25 +560,21 @@ This adjustment also solves the problem arising with pages having the same rank,
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & \frac{1}{2} & 0 & \frac{1}{2} & 0 \\
 \end{array}
-\right)
-\end{equation} 
-
-\begin{equation}
-\textbf{L}_c^T=\left(
+\right)\quad\mathrm{and}\quad\textbf{L}_c=\left(
 \begin{array}{cccccccc}
+0 & 1 & 0 & \frac{1}{2} & 0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 & \frac{1}{4} & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & \frac{1}{4} & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & \frac{1}{4} & 0 & \frac{1}{3} & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & \frac{1}{2} \\
+0 & 0 & 0 & \frac{1}{2} & 0 & 0 & \frac{1}{3} & \frac{1}{2} \\
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
-\frac{1}{2} & 0 & 0 & 0 & 0 & \frac{1}{2} & 0 & 0 \\
-0 & \frac{1}{4} & \frac{1}{4} & \frac{1}{4} & 0 & 0 & 0 & \frac{1}{4}\\
-1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & \frac{1}{3} & 0 & \frac{1}{3} & 0 & \frac{1}{3} \\
-0 & 0 & 0 & 0 & \frac{1}{2} & \frac{1}{2} & 0 & 0 \\
+0 & 0 & 0 & 0 & \frac{1}{4} & 0 & \frac{1}{3} & 0 \\
 \end{array}
 \right)
-\end{equation}
+\end{equation*}
 
-\begin{equation}
+\begin{equation*}
 \textbf{L}_r\textbf{L}_c^T=\left(
 \begin{array}{cccccccc}
 \frac{5}{6} & 0 & 0 & 0 & 0 & \frac{1}{6} & 0 & 0 \\
@@ -554,9 +587,9 @@ This adjustment also solves the problem arising with pages having the same rank,
 0 & \frac{1}{8} & \frac{1}{8} & \frac{7}{24} & 0 & \frac{1}{6} & 0 & \frac{7}{24} \\
 \end{array}
 \right)
-\end{equation}
+\end{equation*}
 
-\begin{equation}
+\begin{equation*}
 \textbf{L}_c^T\textbf{L}_r=\left(
 \begin{array}{cccccccc}
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
@@ -569,7 +602,7 @@ This adjustment also solves the problem arising with pages having the same rank,
 0 & 0 & 0 & \frac{1}{6} & 0 & 0 & \frac{1}{6} & \frac{2}{3} \\
 \end{array}
 \right)
-\end{equation}
+\end{equation*}
 
 \begin{equation}
 \textnormal{Hub Matrix}=\left(
@@ -586,7 +619,7 @@ This adjustment also solves the problem arising with pages having the same rank,
 \end{equation}
 
 \begin{equation}
-\textnormal{Authority Matix}=\left(
+\textnormal{Authority Matrix}=\left(
 \begin{array}{ccccccc}
 \frac{1}{3} & 0 & \frac{1}{3} & 0 & \frac{1}{3} & 0 & 0 \\
 0 & \frac{1}{2} & 0 & \frac{1}{2} & 0 & 0 & 0 \\
@@ -611,11 +644,11 @@ Global Hub and Authority scores:
 \end{array}\right)
 \end{eqnarray}
 
-\section{Comparing PageRank, HITS and SALSA}
+\section{Comparing PageRank, HITS and SALSA} \label{sec:compare}
 
 \cite{devi2014comparative}
 
-\begin{table}[H] \caption{Page rankings for Figure \ref{Example} using PR, HITS and SALSA }
+\begin{table}[H] \caption{Page rankings for Figure \ref{fig:Example} using PR, HITS and SALSA }
  \centering
  \begin{tabular} {c| c| c| c| c| c} 
  \multirow{2}{*}{Node} & \multirow{2}{*}{PR} & \multicolumn{2}{|c|}{HITS} & \multicolumn{2}{|c}{SALSA} \\ [0.5ex] 
@@ -630,42 +663,42 @@ Global Hub and Authority scores:
  7&3&2&8&2&8\\
  8&1&4&1&4&1\\
  \end{tabular}
- \label{comparison}
+ \label{Table: comparison}
 \end{table}
 
 %--------------------Improvements
-\chapter{Improvements to the PageRank Algorithm}
+\chapter{Improvements to the PageRank Algorithm} \label{chap:Improve}
 
 In this chapter we will discuss various methods of improving the PageRank algorithm in order to improve the accuracy of the PageRank vector for a user. The original algorithm is simplistic in the assumption that a random surfer will move throughout the hyperlink graph without any bias, and so it is not very realistic, as a surfer will be more drawn to pages that interest them specifically, we will discuss this more with respect to the formulation of a Topic-specific PageRank algorithm. Another modified algorithm is the Weighted PageRank which takes into account the importance of the outlinks and inlinks a page has \cite{xing2004weighted}. We can also use Weighted Links Rank, WL Rank, which considers different web page attributes to give different weights to some links, this algorithm gives more weight to links at the beginning of pages \cite{baeza2004web}.
 
-\section{Intelligent Surfer}
+\section{Intelligent Surfer} \label{sec:intelligent}
 PageRank as an algorithm ranks a page highly if it is at the centre of a hyper graph, however the highest ranked pages should also be relevant to the query. We can solve this by the PageRank algorithm by the use of an intelligent surfer as opposed to a random surfer. The intelligent surfer will be more likely to jump to a more content-filled page, and so these pages should be assigned a greater weight \cite{langville}. In practice, the hyperlink matrix could be formed from using access logs in order to find the tendencies of the surfer. 
 
 The use of an intelligent surfer outperforms the standard PageRank algorithm in terms of the quality of the pages, whilst still being efficient enough in terms of being a practical search engine \cite{richardson2002intelligent}. 
 
-This algorithm can be viewed as a solution to topic drift, as discussed in Section \ref{sec:SALSA}, as only relevant topics will be  given. In order to ensure that the algorithm is efficient, the majority of the computation is performed at crawl time, rather than at query time \cite{richardson2002intelligent}. 
+This algorithm can be viewed as a solution to topic drift, as discussed in Section \ref{sec:HITS}, as only relevant topics will be  given. In order to ensure that the algorithm is efficient, the majority of the computation is performed at crawl time, rather than at query time \cite{richardson2002intelligent}. 
 
 \section{Weighted PageRank}\label{sec:weighted}
 Weighted PageRank algorithm differs from the standard algorithm by assigning more value to important pages rather than diving the rank equally, as each outlink page receives a value which is proportional to its popularity \cite{xing2004weighted}. $W^{in}_{(j,i)}$ is the weight of the link between pages \textit{i} and \textit{j}, which is calculated as 
-\begin{equation}\label{weightin}
+\begin{equation}\label{eq:weightin}
 W^{in}_{(j,i)} = \frac{I_i}{\sum_{k\in R(i)}I_k}
 \end{equation}
 where $I_i$ and $I_k$ represent the number of inlinks of pages \textit{i} and \textit{j} respectively, and $R(j)$ is the set of pages that \textit{j} links into. 
 Similarly $W^{out}_{(j,i)}$ is calculated as
-\begin{equation}\label{weightout}
+\begin{equation}\label{eq:weightout}
 W^{out}_{(j,i)} = \frac{O_i}{\sum_{k\in R(i)}O_k}
 \end{equation}
 
-In the example Figure \ref{Example}, Page 2 has 2 outlinks, 3 and 5. The inlinks and outlinks of these pages are, $I_3 = 1$, $I_5 = 4$, $O_3 = 1$ and $O_5 = 1$, and so we can calculate 
+In the example Figure \ref{fig:Example}, Page 2 has 2 outlinks, 3 and 5. The inlinks and outlinks of these pages are, $I_3 = 1$, $I_5 = 4$, $O_3 = 1$ and $O_5 = 1$, and so we can calculate 
 \[W^{in}_{(2,3)} = \frac{I_3}{I_3 + I_5} = \frac{1}{5} \]
 and 
 \[W^{out}_{(2,3)} = \frac{O_3}{O_3 + O_5} = \frac{1}{2} \] 
 
 The original PageRank formula given in Equation \eqref{power H}, is now modified to 
-\begin{equation} \label{WPR formula}
+\begin{equation} \label{eq:WPR formula}
 \boldsymbol\pi^{(k+1)T} = \boldsymbol\pi^{(k)T}\textbf{H}
 \end{equation}
-When Equation \eqref{weightin} and Equation \eqref{weightout} applied to Figure \ref{Example}, we produce a hyperlink matrix which is different to \textbf{H} produced in section \ref{sec:hyperlink}. 
+When Equation \eqref{eq:weightin} and Equation \eqref{eq:weightout} applied to Figure \ref{fig:Example}, we produce a hyperlink matrix which is different to \textbf{H} produced in section \ref{sec:hyperlink}. 
 
 \[\textbf{W}_{out}=\left(
 \begin{array}{cccccccc}
@@ -739,18 +772,18 @@ when we compare the PageRankings produced by performing the standard algorithm a
 
 The WPR algorithm has been shown as being able to identify a greater number of relevant pages when compared to the standard PR algorithm \cite{xing2004weighted}. We will also use the WPR algorithm later in this report in section \ref{sec:Roads}, in order to predict the human movement in an urban space. 
 
-\section{Personalization Vector}
+\section{Personalization Vector} \label{sec:Personalization}
 
-\section{Topic Specific PageRank}
+\section{Topic Specific PageRank} \label{sec:Topic specific PR}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{Topic-specific_PageRank_Manning.png}
 \caption{Topic-specific PageRank, where a user has 60\% interest in sports, and 40\% interest in politics, taken from \cite{manning}}
-\label{topic-specific}
+\label{fig:topic-specific}
 \end{figure}
 
-In \ref{topic-specific}, $\alpha$ is 0.9, the user will teleport 6\% to sports pages, and 4\% to politics pages.
+In Figure \ref{fig:topic-specific}, $\alpha$ is 0.9, the user will teleport 6\% to sports pages, and 4\% to politics pages.
 
 
 \cite{haveliwala1999efficient}, \cite{haveliwala2002topic}
@@ -758,17 +791,17 @@ In \ref{topic-specific}, $\alpha$ is 0.9, the user will teleport 6\% to sports p
 
 
 %--------------------Applications
-\chapter{Applications of the PageRank algorithm}
+\chapter{Applications of the PageRank algorithm} \label{chap:Applications}
 
 The PageRank algorithm can also be used in many varied applications beyond ranking web pages \cite{gleich2015pagerank}, which we explore in this chapter. We will explore the algorithm with respect to modelling traffic in Durham in more detail, alongside applications in chemistry and in recommender systems. 
 
 The PageRank algorithm can be used as a measure of network centrality, where you are able to understand a graph better when PageRank reveals what is most important. We are also able to apply modified PageRank to some applications, for example reverse PageRank can be used to model food chains, where a species,\textit{i}, is important if it feeds a species, \textit{j} \cite{allesina2009googling}. 
 
-\section{Wikipedia}
+\section{Wikipedia} \label{sec:wiki}
 We are able to apply PageRank to large databases such as Wikipedia, for example, we can generate reading lists for university courses automatically from exploiting the link structure of Wikipedia \cite{wissner2006preparation}. We are able to rank articles to find the top 100 historical figures and which cultures have the largest reach, for example a culture will have a high PageRank if it has many inlinks from other cultures. PageRank reveals that Carl Linnaeus is the most 'important' page due to the fact that he developed the scientific classification system we use for animals, insects and plants, and so these pages link back to him \cite{eom2015interactions}. We are also able to conclude that the most important figures in history are Western men who are born after the 17th Century. This mathematical analysis of historical figures and cultures using Wikipedia can be very useful in exploring interactions between world cultures and understanding history.
 
 
-\section{Chemistry}
+\section{Chemistry} \label{sec:chem}
 The PageRank algorithm has been used when studying molecules in chemistry, specifically in MoleculaRnetworks \cite{JCC:JCC22917}, which is a toolkit for identifying a shape of a solvent and exploring the H-bonding in that solvent. 
 \begin{figure}
 \includegraphics[width=\linewidth]{Decomposition_of_simulation_date_into_a_graph_-chem.jpg}
@@ -777,47 +810,48 @@ The PageRank algorithm has been used when studying molecules in chemistry, speci
 \end{figure}
 We are able to assess changes to the Hydrogen bond network due to the solute through the analysis of the network structure, as a graph is formed where the nodes are water molecules, and links represent potential hydrogen bonds, as shown in Figure \ref{fig:chem}. PageRank of each water molecule is determined by the number of edges connected to it, along with the number of edges connected to the nodes neighbours. As each polyhedron has its own unique PageRank vector, we are able to access a database in order to confirm the polyhedra structure. The use of PageRank is a novel way to extract chemical information, and can enhance the traditional methods used in chemical spectroscopy.
 
-%\section{Recommender Systems}
+%\section{Recommender Systems} \label{sec:recommender}
 
 %References:\cite{gori2007itemrank}
 \section{Roads and Urban Networks} \label{sec:Roads}
-We are able to apply the PageRank algorithm to road networks in order to predict traffic flow and also human movement. Jiang et al. found that Weighted PageRank, as discussed in Section \ref{sec:weighted} of this report, is the best metric with regards to correlating or predicting traffic flow \cite{1742-5468-2008-07-P07008}. A city can be topologically represented by a connectivity graph as shown in Figure \ref{city rep}, and as over 60\% of human movement can be predicted or explained using a connectivity graph \cite{doi:10.1080/13658810802022822}.
+We are able to apply the PageRank algorithm to road networks in order to predict traffic flow and also human movement. Jiang et al. found that Weighted PageRank, as discussed in Section \ref{sec:weighted} of this report, is the best metric with regards to correlating or predicting traffic flow \cite{1742-5468-2008-07-P07008}. A city can be topologically represented by a connectivity graph as shown in Figure \ref{fig:city rep}, and as over 60\% of human movement can be predicted or explained using a connectivity graph \cite{doi:10.1080/13658810802022822}.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=\linewidth]{map_view.jpeg}
 \caption{(a) A fictive urban system, (b) its axial map and (c) connectivity graph, taken from \cite{doi:10.1080/13658810802022822}}
-\label{city rep}
+\label{fig:city rep}
 \end{figure}
 
 This application is slightly different to the usual PageRank algorithm, as the graph formed from a urban space is a connected graph, and so there are no dangling nodes involved, in terms of a random walker, they will never get stuck, we assume that they never get tired and that they always move to one of its successors with non-uniform probability, as well-connected streets are preferable. Due to this non-uniform probability, we need to use the weighted PageRank algorithm as discussed in Section \ref{sec:weighted} as opposed to the standard algorithm.
 
 
 
-\subsection{Durham}
+\subsection{Durham} \label{sec:durham}
 Jiang showed that PageRank scores are significantly correlated to human movement in four areas of London \cite{doi:10.1080/13658810802022822}, and we will use this methodology as a basis for our analysis of vehicle movement in Durham. 
 \subsubsection{Methodology}
-In order to represent the road network in Durham, we first produce an axial map and then are able to form a connectivity graph. The axial map is produced by taking a map of Durham, Figure \ref{durham map}, and representing the intersections of the roads by a 'The axial map is constructed by taking an accurate map and drawing a set of intersecting lines through all the spaces of the urban grid so that the grid is covered and all rings of circulation are completed.' \cite{Axialmap40:online}
+In order to represent the road network in Durham, we first produce an axial map and then are able to form a connectivity graph. The axial map is produced by taking a map of Durham, Figure \ref{fig:durham map}, and representing the intersections of the roads by a 'The axial map is constructed by taking an accurate map and drawing a set of intersecting lines through all the spaces of the urban grid so that the grid is covered and all rings of circulation are completed.' \cite{Axialmap40:online}, thus forming the axial map in Figure \ref{fig:durham axial}. This axial map can now be represented as a directed hypergraph, Figure \ref{fig:durham graph}. 
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=\linewidth]{durham_with_colour.jpg}
 \caption{Durham road network}
-\label{durham map}
+\label{fig:durham map}
 \end{figure}
 \begin{figure}[h]
 \centering
 \includegraphics[width=\linewidth]{axial_colour_label.png}
 \caption{Durham road network represented by an axial graph}
-\label{durham axial}
+\label{fig:durham axial}
 \end{figure}
 
 \begin{figure}[h]
 \includegraphics[width=\linewidth]{ipe_durham.png}
 \caption{Durham road network represented by a hypergraph}
-\label{durham graph}
+\label{fig:durham graph}
 \end{figure}
-\subsubsection{Results and Analysis}
+
+\subsubsection{Results and Analysis} \label{sec:results}
 \begin{table}[h] \caption{Comparison of PageRankings produced by standard algorithm and the weighted PageRank algorithm on Durham}
  \centering
  \begin{tabular} {c c| c c} 
@@ -850,13 +884,13 @@ In order to represent the road network in Durham, we first produce an axial map 
  25&Whinney Hill&3&3\\
  
  \end{tabular}
- \label{Durham comparison}
+ \label{Table:Durham comparison}
 \end{table}
 
-\subsubsection{Conclusion}
+\subsubsection{Conclusion} \label{sec:Durham conc}
 
 %--------------------Conclusion
-\chapter{Conclusion}
+\chapter{Conclusion} \label{chap:Conclusion}
 %--------------------Bibliography
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliographystyle{plain}
@@ -918,7 +952,7 @@ In order to represent the road network in Durham, we first produce an axial map 
 0.019 & 0.019 & 0.019 & 0.019 & 0.444 & 0.019 & 0.444 & 0.019 
 \end{array}
 \right)
-\end{align*}
+\end{align*} 
 %--------------------
 \chapter{Durham Results}
 \begin{figure} [H]  
@@ -979,7 +1013,7 @@ In order to represent the road network in Durham, we first produce an axial map 
 \right)
 \end{equation*} 
 \caption{Hyperlink matrix for Durham}
-\end{figure}  \label{DH}
+\end{figure}  \label{fig:DH}
 \begin{figure} [H]  
 \begin{equation*} \small
 \left(
@@ -1038,7 +1072,7 @@ In order to represent the road network in Durham, we first produce an axial map 
 \right)
 \end{equation*} 
 \caption{Weighted hyperlink matrix for Durham}
-\end{figure}  \label{DWH}
+\end{figure}  \label{fig:DWH}
 \begin{figure} [H]  
 \begin{equation} 
 \boldsymbol\pi_{PR} = \left(
@@ -1101,7 +1135,7 @@ In order to represent the road network in Durham, we first produce an axial map 
 \right)
 \end{equation} 
 \caption{PageRank vector for Durham}
-\end{figure}  \label{DPR}
+\end{figure}  \label{fig:DPR}
 
 \chapter{Matlab code} \label{app:code}
 
